@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Admin</title>
+    </head>
+
+    <style>
+
+        body{
+            background-color: #000000;
+            color: #ffffff;
+        }
+        td{
+            border: 1px solid #ffffff;
+            padding: 10px;
+        }
+
+    </style>
+
+    <body>
+        
+        <!-- make a table with cells that can be changed easily with js-->
+        <h1>
+            Admin
+        </h1>
+
+        <table id='pagesTable'>
+            <tr>
+                <td>Page</td>   
+                <td>Active Users</td>
+            </tr>
+
+            
+
+        </table>
+    </body>
+
+
+    <script>
+        //query /countRoutes which returns something like this: {"/io/f":1,"/io/testing/Minecraft":1} and then make a table with the keys and values
+
+        let table = document.getElementById('pagesTable');
+
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                
+                let routes = JSON.parse(this.responseText);
+                console.log(routes);
+
+                for (let route in routes){
+                    let row = table.insertRow(-1);
+                    let cell1 = row.insertCell(0);
+                    let cell2 = row.insertCell(1);
+
+                    cell1.innerHTML = route;
+                    cell2.innerHTML = routes[route];
+                }
+            }
+        };
+        xhttp.open("GET", "/countRoutes", true);
+        xhttp.send();
+
+        
+
+    </script>
+
+
+
+</html>
