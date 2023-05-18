@@ -6,9 +6,8 @@ const app = express();
 const server = http.createServer(app);
 const cookieParser = require('cookie-parser');
 const io = socketIO(server);
-const Session = require('./session.js');
-const Sessions = require('./sessions.js');
-const { Application } = require('discord.js');
+const Session = require('./Session.js');
+const Sessions = require('./Sessions.js');
 
 let activeSessions = new Sessions();
 
