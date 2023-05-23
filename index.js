@@ -24,20 +24,20 @@ const html = `
     <h1> Analytics </h1>
     <h2> This should not be visible </h2>
 
-    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js" integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+" crossorigin="anonymous"></script>
+    <script src="/socket.io.js"></script>
 
     <script> 
         const socket = io();
         //every 1 seconds, send a message to the server with contents of the cookies and the current url
         function sendMessage(){
             socket.emit('message', document.getElementById('cookie').innerText + ' ' + window.location.href);
-        }
+        } 
         console.log("REFFERER");    
         console.log(document.referrer);
 
         sendMessage();
         setInterval(() => {
-            sendMessage();
+            sendMessage(); 
         }, 10000);
 
     </script>
@@ -80,6 +80,9 @@ app.get('/countRoutes', (req, res) => {
     res.send(activeSessions.countRoutes());
 });
 
+app.get('/admin', (req, res) => {
+    res.sendFile(__dirname + '/admin.html');
+});
 
 
 app.get('/queryByRouteEmbedded/*', (req, res) => {
@@ -113,15 +116,21 @@ app.get('/io/*', (req, res) => {
 io.on('connection', (socket) => {
     //get ip 
     let ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
-    
     socket.on('message', (message) => {
         socket.sessionID = message.split(' ')[0];
         verify = uuid4.valid(socket.sessionID);
+
+        if(activeSessions.getSession(socket.sessionID) == null){
+            activeSessions.addSession( new Session(socket.sessionID,message.split(' ')[1],ip,Date.now()));
+        }
+
         if(verify){
             let session = activeSessions.getSession(socket.sessionID);
             if(session !== undefined){
                 session.updateLastActive();
             }
+            
+
         }
     });
     socket.on('disconnect', () => {
@@ -134,6 +143,12 @@ io.on('connection', (socket) => {
     });
     }
 );
+
+
+setInterval(function(){
+   activeSessions.pruneSessions();
+}, 5000)
+
 
 server.listen(3001, () => {
     console.log('listening on *:3001');

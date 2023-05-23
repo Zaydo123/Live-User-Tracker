@@ -3,6 +3,22 @@ class Sessions{
         this.activeSessions = {sessions : []};
     }
 
+    pruneSessions(){
+        let removed = [];
+        for(let i = 0; i < this.activeSessions.sessions.length; i++){
+            if(Date.now()-this.activeSessions.sessions[i].getLastActive() > 30000){
+                removed.push(this.activeSessions.sessions[i])
+                this.removeSession(this.activeSessions.sessions[i].id);
+            }
+
+            if( removed.length < 1 ){
+                return []
+            } else { 
+                return removed; 
+            }
+        }
+    }
+
     sessionExists(id){
         for(let i = 0; i < this.activeSessions.sessions.length; i++){
             if(this.activeSessions.sessions[i].id === id){
@@ -34,6 +50,7 @@ class Sessions{
                 return this.activeSessions.sessions[i];
             }
         }
+        return null; 
     }
 
     getSessionsByIP(ip){

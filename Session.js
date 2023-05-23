@@ -49,6 +49,9 @@ class Session{
     updateLastActive(){
         this.lastActive = Date.now();
     }
+    getLastActive(){
+        return this.lastActive;
+    }
     toString(){
         return `Session: ${this.id}, ${this.routeEmbedded}, ${this.ip}, ${this.timeStart}`;
     }
